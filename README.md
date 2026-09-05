@@ -2,6 +2,8 @@
 
 React + Node.js rebuild of [shaktiworld.org](https://shaktiworld.org/), with the original content and a refreshed editorial design.
 
+A Collective of Women. A Celebration of Voice. A Movement of Power.
+
 ## Pages copied from the live site
 
 - Home
