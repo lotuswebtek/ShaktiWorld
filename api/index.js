@@ -1,4 +1,5 @@
 import app from '../server/app.js'
+import { databaseHost } from '../server/db/pool.js'
 
 export const config = {
   maxDuration: 30,
@@ -42,6 +43,7 @@ export default function handler(req, res) {
           ok: true,
           name: 'Shaktiworld API',
           db: Boolean(process.env.DATABASE_URL),
+          dbHost: databaseHost(),
           clerk: Boolean(process.env.CLERK_SECRET_KEY),
         }),
       )

@@ -51,7 +51,13 @@ router.get('/', async (_req, res) => {
     return res.json({ ok: true, upcoming, past })
   } catch (err) {
     console.error('events GET error:', err.message)
-    return res.status(500).json({ message: 'Internal error.', detail: err.message })
+    const unreachable = /ENOTFOUND/i.test(err.message)
+    return res.status(500).json({
+      message: unreachable
+        ? 'The database host in DATABASE_URL is not reachable from Vercel. Use Railway DATABASE_PUBLIC_URL (the host should end with proxy.rlwy.net).'
+        : 'Internal error.',
+      detail: err.message,
+    })
   } finally {
     if (client) client.release()
   }

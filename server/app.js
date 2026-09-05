@@ -4,6 +4,7 @@ import { clerkClient, clerkMiddleware, getAuth } from '@clerk/express'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { databaseHost } from './db/pool.js'
 import onboardingRoutes from './routes/onboarding.js'
 import supportRoutes from './routes/support.js'
 import listeningRoutes from './routes/listening.js'
@@ -13,8 +14,7 @@ import eventsRoutes from './routes/events.js'
 import eventRsvpRoutes from './routes/eventRsvp.js'
 import resourcesRoutes from './routes/resources.js'
 import moderationRoutes from './routes/moderation.js'
-import requireVerified from './middleware/requireVerified.js'
-import noCache from './middleware/noCache.js'
+import pool, { databaseHost } from './db/pool.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DATA_DIR = process.env.VERCEL
@@ -64,6 +64,7 @@ app.get(['/api/health', '/health'], (_req, res) => {
     ok: true,
     name: 'Shaktiworld API',
     db: Boolean(process.env.DATABASE_URL),
+    dbHost: databaseHost(),
     clerk: Boolean(process.env.CLERK_SECRET_KEY),
   })
 })

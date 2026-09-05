@@ -30,8 +30,8 @@ export default function CommunityResources() {
       setError(null)
       try {
         const res = await fetch(`${API}/api/resources${qs ? `?${qs}` : ''}`)
-        if (!res.ok) throw new Error('Failed to load resources.')
-        const data = await res.json()
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(data.message || 'Failed to load resources.')
         setGroups(data.groups || {})
         setTopics(data.topics || [])
       } catch (err) {
