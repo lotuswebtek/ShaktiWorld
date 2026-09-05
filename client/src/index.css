@@ -288,6 +288,7 @@ p {
   flex-direction: column;
   align-items: stretch;
   gap: 0.55rem;
+  flex-shrink: 0;
 }
 
 .nav-cta .btn,

@@ -81,6 +81,17 @@ export default function Layout() {
       )}
 
       <aside className={`site-sidebar ${open ? 'open' : ''}`} aria-hidden={!open}>
+        {!isSignedIn && (
+          <div className="nav-cta">
+            <Link className="btn btn-solid" to="/register" onClick={close}>
+              Register
+            </Link>
+            <Link className="btn btn-ghost" to="/log-in" onClick={close}>
+              Sign in
+            </Link>
+          </div>
+        )}
+
         <nav className="nav" aria-label="Primary">
           {visibleLinks.map((item) => (
             <NavItem key={item.to} {...item} end={item.to === '/'} onClick={close} />
@@ -95,9 +106,11 @@ export default function Layout() {
 
         <div className="sidebar-end">
           {!isSignedIn && <SocialIcons />}
-          <div className="nav-cta">
-            <AuthButtons onNavigate={close} />
-          </div>
+          {isSignedIn && (
+            <div className="nav-cta">
+              <AuthButtons onNavigate={close} />
+            </div>
+          )}
         </div>
       </aside>
 
