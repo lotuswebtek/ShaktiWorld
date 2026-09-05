@@ -20,7 +20,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DATA_DIR = process.env.VERCEL
   ? path.join('/tmp', 'shaktiworld-data')
   : path.join(__dirname, 'data')
-const CLIENT_DIST = path.join(__dirname, '../client/dist')
 
 fs.mkdirSync(DATA_DIR, { recursive: true })
 
@@ -37,12 +36,37 @@ function writeJson(file, data) {
   fs.writeFileSync(path.join(DATA_DIR, file), JSON.stringify(data, null, 2))
 }
 
-const app = express()
-if (process.env.CLERK_SECRET_KEY) {
-  app.use(clerkMiddleware())
+function isPublicApi(req) {
+  const pathOnly = String(req.url || '').split('?')[0]
+  if (req.method !== 'GET') return false
+  return (
+    pathOnly === '/api/health' ||
+    pathOnly === '/health' ||
+    pathOnly.startsWith('/api/events') ||
+    pathOnly.startsWith('/api/resources')
+  )
 }
+
+const app = express()
+app.set('trust proxy', 1)
+
+const clerk = process.env.CLERK_SECRET_KEY ? clerkMiddleware() : null
+
+app.use((req, res, next) => {
+  if (isPublicApi(req) || !clerk) return next()
+  return clerk(req, res, next)
+})
 app.use(cors({ origin: true, credentials: true }))
 app.use(express.json({ limit: '1mb' }))
+
+app.get(['/api/health', '/health'], (_req, res) => {
+  res.json({
+    ok: true,
+    name: 'Shaktiworld API',
+    db: Boolean(process.env.DATABASE_URL),
+    clerk: Boolean(process.env.CLERK_SECRET_KEY),
+  })
+})
 
 app.use('/api/onboarding', onboardingRoutes)
 app.use('/api/events', eventsRoutes)
@@ -56,15 +80,6 @@ app.use('/api/community/jobs', jobsRoutes)
 app.use('/api/community/businesses', businessesRoutes)
 app.use('/api/community/events', eventRsvpRoutes)
 app.use('/api/moderation', moderationRoutes)
-
-app.get('/api/health', (_req, res) => {
-  res.json({
-    ok: true,
-    name: 'Shaktiworld API',
-    db: Boolean(process.env.DATABASE_URL),
-    clerk: Boolean(process.env.CLERK_SECRET_KEY),
-  })
-})
 
 app.get('/api/me', async (req, res) => {
   const { isAuthenticated, userId } = getAuth(req)
@@ -118,11 +133,15 @@ app.post('/api/applications', (req, res) => {
   res.json({ ok: true, message: 'Application received. Our team will reach out soon.' })
 })
 
-if (!process.env.VERCEL && fs.existsSync(CLIENT_DIST)) {
-  app.use(express.static(CLIENT_DIST))
-  app.get(/.*/, (_req, res) => {
-    res.sendFile(path.join(CLIENT_DIST, 'index.html'))
-  })
-}
+app.use((req, res) => {
+  res.status(404).json({ message: 'Not found.', path: req.url })
+})
+
+app.use((err, req, res, _next) => {
+  const detail = err instanceof Error ? err.message : 'Unknown error'
+  console.error('API error:', detail)
+  if (res.headersSent) return
+  res.status(500).json({ message: 'Internal error.', detail })
+})
 
 export default app

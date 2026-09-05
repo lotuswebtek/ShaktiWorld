@@ -26,7 +26,7 @@ export default function OurEvents() {
     const load = async () => {
       try {
         const res = await fetch(`${API}/api/events`)
-        if (!res.ok) throw new Error('Could not load posted events.')
+        if (!res.ok) return
         const data = await res.json()
         setPosted([...(data.upcoming || []), ...(data.past || [])])
       } catch (err) {

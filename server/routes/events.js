@@ -25,6 +25,9 @@ async function resolveVerifiedUser(client, clerkId) {
 }
 
 router.get('/', async (_req, res) => {
+  if (!process.env.DATABASE_URL) {
+    return res.json({ ok: true, upcoming: [], past: [] })
+  }
   let client
   try {
     client = await pool.connect()
@@ -48,7 +51,7 @@ router.get('/', async (_req, res) => {
     return res.json({ ok: true, upcoming, past })
   } catch (err) {
     console.error('events GET error:', err.message)
-    return res.status(500).json({ message: 'Internal error.' })
+    return res.status(500).json({ message: 'Internal error.', detail: err.message })
   } finally {
     if (client) client.release()
   }
