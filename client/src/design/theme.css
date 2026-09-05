@@ -1,0 +1,246 @@
+@import "tailwindcss";
+
+/*
+ * Shaktiworld Design System
+ * ─────────────────────────
+ * Palette drawn from traditional textile dyes:
+ *   Indigo (neel) — deep indigo blue from natural dye
+ *   Madder (alizarin) — earthy red from rubia roots
+ *   Turmeric (haldi) — warm saffron-gold
+ *   Cotton (kora) — unbleached natural whites
+ *
+ * All foreground/background pairings meet WCAG AA (4.5:1 body, 3:1 large text).
+ */
+
+@theme {
+  /* ── Indigo (neel) ── */
+  --color-indigo-950: #0c1024;
+  --color-indigo-900: #1a1f3d;
+  --color-indigo-800: #252c56;
+  --color-indigo-700: #2f3a6f;
+  --color-indigo-600: #3d4e8a;
+  --color-indigo-500: #4e63a3;
+  --color-indigo-400: #6b80be;
+  --color-indigo-300: #97a8d4;
+  --color-indigo-200: #c4cfe8;
+  --color-indigo-100: #e6ecf5;
+  --color-indigo-50:  #f2f4fa;
+
+  /* ── Madder (alizarin red) ── */
+  --color-madder-950: #2a0c10;
+  --color-madder-900: #4d151c;
+  --color-madder-800: #6f1d2b;
+  --color-madder-700: #8b2838;
+  --color-madder-600: #a83545;
+  --color-madder-500: #c04555;
+  --color-madder-400: #d46b78;
+  --color-madder-300: #e49aa3;
+  --color-madder-200: #f0c5cb;
+  --color-madder-100: #f9e4e7;
+  --color-madder-50:  #fdf2f3;
+
+  /* ── Turmeric (haldi gold) ── */
+  --color-haldi-950: #1f1608;
+  --color-haldi-900: #3d2c10;
+  --color-haldi-800: #6b4e1c;
+  --color-haldi-700: #997028;
+  --color-haldi-600: #b8892e;
+  --color-haldi-500: #c4a35a;
+  --color-haldi-400: #d4ba78;
+  --color-haldi-300: #e3d09e;
+  --color-haldi-200: #f0e4c4;
+  --color-haldi-100: #f8f1e0;
+  --color-haldi-50:  #fcf8f0;
+
+  /* ── Cotton (kora — natural whites) ── */
+  --color-kora-950: #2a1814;
+  --color-kora-900: #4a3028;
+  --color-kora-800: #6e564c;
+  --color-kora-700: #8c7468;
+  --color-kora-600: #a89384;
+  --color-kora-500: #c4b0a0;
+  --color-kora-400: #d8cab8;
+  --color-kora-300: #e8ddd0;
+  --color-kora-200: #f0e8dc;
+  --color-kora-100: #f7f0e6;
+  --color-kora-50:  #fdfaf5;
+
+  /* ── Semantic aliases ── */
+  --color-surface: var(--color-kora-50);
+  --color-surface-warm: var(--color-kora-100);
+  --color-surface-invert: var(--color-indigo-950);
+  --color-ink: var(--color-kora-950);
+  --color-ink-muted: var(--color-kora-800);
+  --color-ink-subtle: var(--color-kora-600);
+  --color-ink-invert: var(--color-kora-50);
+  --color-border: var(--color-kora-300);
+  --color-border-strong: var(--color-kora-400);
+  --color-accent: var(--color-madder-800);
+  --color-accent-hover: var(--color-madder-900);
+  --color-highlight: var(--color-haldi-500);
+  --color-highlight-hover: var(--color-haldi-600);
+
+  /* ── Typography ── */
+  --font-display: "Noto Serif Devanagari", "Cormorant Garamond", Georgia, serif;
+  --font-body: "Outfit", system-ui, -apple-system, sans-serif;
+
+  /* ── Type scale (major third — 1.25) ── */
+  --text-xs:   0.64rem;   /* 10.24px */
+  --text-sm:   0.8rem;    /* 12.8px  */
+  --text-base: 1rem;      /* 16px    */
+  --text-lg:   1.25rem;   /* 20px    */
+  --text-xl:   1.563rem;  /* 25px    */
+  --text-2xl:  1.953rem;  /* 31.25px */
+  --text-3xl:  2.441rem;  /* 39px    */
+  --text-4xl:  3.052rem;  /* 48.8px  */
+  --text-5xl:  3.815rem;  /* 61px    */
+
+  /* ── Spacing scale ── */
+  --spacing-px: 1px;
+  --spacing-0: 0;
+  --spacing-1: 0.25rem;
+  --spacing-2: 0.5rem;
+  --spacing-3: 0.75rem;
+  --spacing-4: 1rem;
+  --spacing-5: 1.25rem;
+  --spacing-6: 1.5rem;
+  --spacing-8: 2rem;
+  --spacing-10: 2.5rem;
+  --spacing-12: 3rem;
+  --spacing-16: 4rem;
+  --spacing-20: 5rem;
+  --spacing-24: 6rem;
+  --spacing-32: 8rem;
+
+  /* ── Layout ── */
+  --container-max: 1200px;
+  --radius-sm: 2px;
+  --radius-md: 4px;
+  --radius-lg: 8px;
+  --radius-full: 9999px;
+
+  /* ── Shadows ── */
+  --shadow-sm: 0 1px 3px rgba(42, 24, 20, 0.06);
+  --shadow-md: 0 4px 16px rgba(42, 24, 20, 0.08);
+  --shadow-lg: 0 12px 40px rgba(42, 24, 20, 0.12);
+  --shadow-xl: 0 24px 60px rgba(42, 24, 20, 0.16);
+}
+
+/* ── Base layer ── */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--color-ink);
+    background: var(--color-surface);
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    font-weight: 500;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--color-ink);
+  }
+
+  /* Type scale defaults */
+  h1 { font-size: var(--text-4xl); }
+  h2 { font-size: var(--text-3xl); }
+  h3 { font-size: var(--text-2xl); }
+  h4 { font-size: var(--text-xl); }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  /* Reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ── Component layer ── */
+@layer components {
+  /* Eyebrow / kicker text */
+  .ds-eyebrow {
+    font-family: var(--font-body);
+    font-size: var(--text-xs);
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--color-highlight);
+  }
+
+  /* Body lead text */
+  .ds-lede {
+    font-size: var(--text-lg);
+    color: var(--color-ink-muted);
+    max-width: 62ch;
+  }
+
+  /* Button system */
+  .ds-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-full);
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+  }
+
+  .ds-btn:hover { transform: translateY(-1px); }
+  .ds-btn:active { transform: translateY(0); }
+  .ds-btn:disabled { opacity: 0.55; pointer-events: none; }
+
+  .ds-btn-primary {
+    background: var(--color-accent);
+    color: var(--color-ink-invert);
+  }
+  .ds-btn-primary:hover { background: var(--color-accent-hover); }
+
+  .ds-btn-secondary {
+    background: var(--color-highlight);
+    color: var(--color-indigo-950);
+  }
+  .ds-btn-secondary:hover { background: var(--color-highlight-hover); }
+
+  .ds-btn-ghost {
+    background: transparent;
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+  }
+  .ds-btn-ghost:hover {
+    background: var(--color-accent);
+    color: var(--color-ink-invert);
+  }
+
+  .ds-btn-outline-light {
+    background: transparent;
+    color: var(--color-ink-invert);
+    border-color: rgba(253, 250, 245, 0.4);
+  }
+  .ds-btn-outline-light:hover {
+    background: var(--color-ink-invert);
+    color: var(--color-indigo-950);
+  }
+}

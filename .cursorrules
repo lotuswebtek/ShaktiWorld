@@ -1,0 +1,43 @@
+# Shaktiworld — Cursor Rules
+
+## TypeScript
+
+- Use TypeScript in strict mode (`"strict": true` in tsconfig).
+- No `any` unless absolutely unavoidable, and add a `// TODO: remove any` comment when used.
+- Prefer explicit return types on exported functions.
+
+## Dependencies
+
+- Do not add new npm dependencies (client or server) without asking first.
+- If a task can be done with built-in Node/browser APIs or existing packages, do that.
+
+## Authentication & Authorisation
+
+- Every protected route (API or page) must check authentication server-side via Clerk middleware (`clerkMiddleware` + `getAuth`).
+- Never rely solely on client-side guards (`<Show when="signed-in">`, `useAuth`) for access control — those are UX conveniences, not security.
+- If a request fails auth, return 401 with a generic message. Never leak why auth failed beyond "not authenticated" or "session expired".
+
+## Privacy & PII
+
+- Never log personally identifiable information (email, name, phone, address, IP) to stdout, files, or external services.
+- Never include PII in error responses, analytics payloads, or client-side state that could be inspected in devtools beyond what Clerk already exposes.
+- Redact PII before passing data to any third-party API.
+
+## User-Facing Copy
+
+- All user-facing text must avoid promising outcomes.
+  - ❌ "We will find you a job"
+  - ❌ "We will keep you safe"
+  - ❌ "We guarantee results"
+  - ✅ "Explore opportunities shared by our community"
+  - ✅ "Connect with resources and support networks"
+  - ✅ "Access information curated by Shaktiworld members"
+- The platform connects, informs, and supports. It does not deliver results on behalf of members.
+- Refer to PROJECT_SPEC.md § Non-Goals before writing any copy for Services, Listening, Jobs, or Education sections.
+
+## General
+
+- Keep components small and single-purpose.
+- Co-locate tests next to source files when tests are written.
+- Prefer named exports over default exports for non-page components.
+- CSS changes should use existing custom properties (see `index.css :root`) before introducing new ones.
