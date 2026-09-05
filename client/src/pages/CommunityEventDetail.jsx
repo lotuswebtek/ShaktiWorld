@@ -4,7 +4,7 @@ import { useAuth } from '@clerk/react'
 import useOnboarding from '../hooks/useOnboarding.js'
 import { memberRegisterPath } from '../components/NavItem.jsx'
 
-const API = import.meta.env.VITE_API_URL || ''
+import { API } from '../config/env.js'
 
 function formatRange(startIso, endIso) {
   const start = new Date(startIso)

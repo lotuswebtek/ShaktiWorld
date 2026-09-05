@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import { SignUp } from '@clerk/react'
 import { CURRENT_LEGAL } from '../data/legal.js'
+import { site } from '../data/site.js'
+import { CLERK_PUBLISHABLE_KEY } from '../config/env.js'
 import { TermsConsent } from '../components/legal/TermsConsent.jsx'
 import {
   clerkUnsafeMetadataFromConsent,
@@ -54,13 +56,20 @@ export default function Register() {
           )}
 
           {showSignUp ? (
-            <div className="clerk-wrap">
-              <SignUp
-                path="/register"
-                signInUrl="/log-in"
-                unsafeMetadata={clerkUnsafeMetadataFromConsent(consentRecord)}
-              />
-            </div>
+            CLERK_PUBLISHABLE_KEY ? (
+              <div className="clerk-wrap">
+                <SignUp
+                  path="/register"
+                  signInUrl="/log-in"
+                  unsafeMetadata={clerkUnsafeMetadataFromConsent(consentRecord)}
+                />
+              </div>
+            ) : (
+              <p className="legal-consent-hint">
+                Account creation is not available on this site yet. Email{' '}
+                <a href={`mailto:${site.email}`}>{site.email}</a> if you need help joining.
+              </p>
+            )
           ) : (
             <p className="legal-consent-hint">
               Accept the current Terms (version {CURRENT_LEGAL.terms}) to continue creating an account.

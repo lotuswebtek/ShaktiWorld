@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { site } from '../data/site.js'
 import SocialIcons from '../components/SocialIcons.jsx'
+import { API } from '../config/env.js'
 
 const empty = { name: '', email: '', subject: '', message: '' }
 
@@ -16,7 +17,7 @@ export default function Contact() {
     e.preventDefault()
     setStatus(null)
     try {
-      const res = await fetch('/api/contact', {
+      const res = await fetch(`${API}/api/contact`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

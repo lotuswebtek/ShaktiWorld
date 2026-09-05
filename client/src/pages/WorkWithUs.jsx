@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import { memberRegisterPath } from '../components/NavItem.jsx'
 import { opportunities } from '../data/site.js'
+import { API } from '../config/env.js'
 
 const empty = { name: '', email: '', interest: 'career', message: '' }
 
@@ -19,7 +20,7 @@ export default function WorkWithUs() {
     e.preventDefault()
     setStatus(null)
     try {
-      const res = await fetch('/api/applications', {
+      const res = await fetch(`${API}/api/applications`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),

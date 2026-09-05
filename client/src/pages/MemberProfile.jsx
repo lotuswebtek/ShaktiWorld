@@ -3,7 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import RequireAuth from '../components/RequireAuth.jsx'
 
-const API = import.meta.env.VITE_API_URL || ''
+import { API } from '../config/env.js'
 
 export default function MemberProfile() {
   const { userId } = useParams()

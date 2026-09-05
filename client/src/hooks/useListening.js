@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@clerk/react'
 
-const API = import.meta.env.VITE_API_URL || ''
+import { API } from '../config/env.js'
 
 /**
  * Hook for the listening feed and post creation.

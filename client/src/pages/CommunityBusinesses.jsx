@@ -4,7 +4,7 @@ import { useAuth } from '@clerk/react'
 import RequireAuth from '../components/RequireAuth.jsx'
 import KolamDivider from '../components/design/KolamDivider.jsx'
 
-const API = import.meta.env.VITE_API_URL || ''
+import { API } from '../config/env.js'
 
 const CATEGORY_OPTIONS = [
   { value: 'home_cooked_food', label: 'Home-cooked food' },

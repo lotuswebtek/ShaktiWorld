@@ -4,7 +4,7 @@ import RequireAuth from '../components/RequireAuth.jsx'
 import Disclaimer from '../components/safety/Disclaimer.jsx'
 import KolamDivider from '../components/design/KolamDivider.jsx'
 
-const API = import.meta.env.VITE_API_URL || ''
+import { API } from '../config/env.js'
 
 const WORK_MODE_OPTIONS = [
   { value: 'either', label: 'Remote or onsite' },

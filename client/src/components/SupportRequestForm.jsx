@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '@clerk/react'
 import SafeForm from './safety/SafeForm.jsx'
 
-const API = import.meta.env.VITE_API_URL || ''
+import { API } from '../config/env.js'
 
 const VISIBILITY_OPTIONS = [
   { value: 'private_to_moderators', label: 'Private — visible only to moderators' },

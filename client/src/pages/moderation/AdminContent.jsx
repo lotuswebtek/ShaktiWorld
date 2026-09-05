@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import useOnboarding from '../../hooks/useOnboarding.js'
 
-const API = import.meta.env.VITE_API_URL || ''
+import { API } from '../../config/env.js'
 
 const RESOURCE_TYPES = [
   { value: 'article', label: 'Article' },

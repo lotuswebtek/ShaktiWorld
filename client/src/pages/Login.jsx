@@ -1,4 +1,6 @@
 import { SignIn } from '@clerk/react'
+import { site } from '../data/site.js'
+import { CLERK_PUBLISHABLE_KEY } from '../config/env.js'
 
 export default function Login() {
   return (
@@ -11,9 +13,17 @@ export default function Login() {
           <p className="kicker">Log in</p>
           <h2>Welcome back</h2>
           <p className="lede">Sign in to continue creating, connecting, and empowering.</p>
-          <div className="clerk-wrap">
-            <SignIn path="/log-in" signUpUrl="/register" />
-          </div>
+          {CLERK_PUBLISHABLE_KEY ? (
+            <div className="clerk-wrap">
+              <SignIn path="/log-in" signUpUrl="/register" />
+            </div>
+          ) : (
+            <p className="legal-consent-hint">
+              Sign in is not available on this site yet. Email{' '}
+              <a href={`mailto:${site.email}`}>{site.email}</a> if you need help accessing your
+              account.
+            </p>
+          )}
         </div>
       </div>
     </section>

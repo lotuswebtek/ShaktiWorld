@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import KolamDivider from '../components/design/KolamDivider.jsx'
 
-const API = import.meta.env.VITE_API_URL || ''
+import { API } from '../config/env.js'
 
 function formatWhen(iso) {
   return new Date(iso).toLocaleString(undefined, {

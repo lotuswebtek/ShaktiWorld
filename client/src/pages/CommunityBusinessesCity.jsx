@@ -5,7 +5,7 @@ import RequireAuth from '../components/RequireAuth.jsx'
 import KolamDivider from '../components/design/KolamDivider.jsx'
 import { CATEGORY_OPTIONS, categoryLabel } from './CommunityBusinesses.jsx'
 
-const API = import.meta.env.VITE_API_URL || ''
+import { API } from '../config/env.js'
 
 export default function CommunityBusinessesCity() {
   const { city } = useParams()

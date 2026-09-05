@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import RequireAuth from '../../components/RequireAuth.jsx'
 
-const API = import.meta.env.VITE_API_URL || ''
+import { API } from '../../config/env.js'
 
 const STATUS_LABELS = {
   open: 'Open',
