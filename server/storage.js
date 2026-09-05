@@ -15,7 +15,9 @@ const EXT_BY_MIME = {
 }
 
 function storageRoot() {
-  return process.env.ID_STORAGE_DIR || DEFAULT_DIR
+  if (process.env.ID_STORAGE_DIR) return process.env.ID_STORAGE_DIR
+  if (process.env.VERCEL) return path.join('/tmp', 'shaktiworld-id-documents')
+  return DEFAULT_DIR
 }
 
 function assertSafeKey(storageKey) {

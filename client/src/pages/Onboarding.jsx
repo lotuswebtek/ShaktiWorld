@@ -7,7 +7,7 @@ import VerificationStatus from '../components/onboarding/VerificationStatus.jsx'
 
 export default function Onboarding() {
   const { isLoaded, isSignedIn } = useAuth()
-  const { status, loading, submitProfile, uploadId, refresh } = useOnboarding()
+  const { status, loading, error, submitProfile, uploadId, refresh } = useOnboarding()
 
   if (!isLoaded || loading) {
     return (
@@ -27,7 +27,18 @@ export default function Onboarding() {
     return (
       <section className="section">
         <div className="container" style={{ textAlign: 'center', padding: '4rem 0' }}>
-          <p className="lede">Setting up your account…</p>
+          <p className="lede">
+            {error
+              ? 'We could not reach the account service. Try again in a moment.'
+              : 'Setting up your account…'}
+          </p>
+          {error && (
+            <p>
+              <button className="btn btn-solid" type="button" onClick={() => refresh()}>
+                Try again
+              </button>
+            </p>
+          )}
         </div>
       </section>
     )

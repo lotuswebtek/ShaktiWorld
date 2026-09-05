@@ -2,12 +2,20 @@
   "name": "shaktiworld",
   "private": true,
   "version": "1.0.0",
+  "type": "module",
   "description": "Shaktiworld — React + Node.js rebuild of shaktiworld.org",
   "scripts": {
     "install:all": "npm install --prefix server && npm install --prefix client",
     "dev": "concurrently -n server,client -c magenta,cyan \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
     "build": "npm run build --prefix client",
     "start": "npm start --prefix server"
+  },
+  "dependencies": {
+    "@clerk/express": "^1.7.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "multer": "^2.3.0",
+    "pg": "^8.23.0"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"

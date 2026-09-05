@@ -1,5 +1,6 @@
 node_modules
 client/dist
+public
 server/data/*.json
 server/data/id-documents/
 !server/data/.gitkeep
