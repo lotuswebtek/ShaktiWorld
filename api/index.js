@@ -49,6 +49,8 @@ export default async function handler(req, res) {
         db: Boolean(readDatabaseUrl()),
         dbHost: host,
         clerk: Boolean(process.env.CLERK_SECRET_KEY),
+        hasDatabaseUrl: Boolean(process.env.DATABASE_URL),
+        hasDatabasePublicUrl: Boolean(process.env.DATABASE_PUBLIC_URL),
         dbHint:
           !host
             ? 'Set DATABASE_URL in Vercel to Railway DATABASE_PUBLIC_URL.'

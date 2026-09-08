@@ -1,13 +1,13 @@
-function readDatabaseUrl() {
-  let raw = String(process.env.DATABASE_URL || '').trim()
-  raw = raw.replace(/^DATABASE_URL\s*=\s*/i, '')
-  raw = raw.split(/\r?\n/)[0].trim()
-  raw = raw.replace(/^['"]|['"]$/g, '')
-  const embedded = raw.match(/postgres(?:ql)?:\/\/\S+/i)
+function sanitize(raw) {
+  let value = String(raw || '').trim()
+  value = value.replace(/^DATABASE_(?:PUBLIC_)?URL\s*[:=]\s*/i, '')
+  value = value.split(/\r?\n/)[0].trim()
+  value = value.replace(/^['"]|['"]$/g, '')
+  const embedded = value.match(/postgres(?:ql)?:\/\/\S+/i)
   if (embedded) {
-    raw = embedded[0].replace(/[),;]+$/, '')
+    value = embedded[0].replace(/[),;]+$/, '')
   }
-  return raw
+  return value
 }
 
 function libpqParams(raw) {
@@ -20,14 +20,12 @@ function libpqParams(raw) {
   return params
 }
 
-export function databaseHost() {
-  const connectionString = readDatabaseUrl()
-  if (!connectionString) return null
+function hostFrom(raw) {
+  if (!raw) return null
   try {
-    return new URL(connectionString.replace(/^postgres:\/\//, 'postgresql://')).hostname || null
+    return new URL(raw.replace(/^postgres:\/\//, 'postgresql://')).hostname || null
   } catch {
-    const host = libpqParams(connectionString).host
-    return host || null
+    return libpqParams(raw).host || null
   }
 }
 
@@ -39,4 +37,20 @@ export function isUsableDatabaseHost(host) {
   return true
 }
 
-export { readDatabaseUrl, libpqParams }
+function candidates() {
+  return [process.env.DATABASE_URL, process.env.DATABASE_PUBLIC_URL].filter(Boolean).map(sanitize)
+}
+
+export function readDatabaseUrl() {
+  const list = candidates()
+  for (const raw of list) {
+    if (isUsableDatabaseHost(hostFrom(raw))) return raw
+  }
+  return list[0] || ''
+}
+
+export function databaseHost() {
+  return hostFrom(readDatabaseUrl())
+}
+
+export { libpqParams }
