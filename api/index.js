@@ -1,21 +1,7 @@
+import { databaseHost, readDatabaseUrl } from '../server/db/url.js'
+
 export const config = {
   maxDuration: 30,
-}
-
-function readDatabaseUrl() {
-  return String(process.env.DATABASE_URL || '')
-    .trim()
-    .replace(/^['"]|['"]$/g, '')
-}
-
-function databaseHost() {
-  const connectionString = readDatabaseUrl()
-  if (!connectionString) return null
-  try {
-    return new URL(connectionString.replace(/^postgres:\/\//, 'postgresql://')).hostname
-  } catch {
-    return null
-  }
 }
 
 function requestPath(req) {

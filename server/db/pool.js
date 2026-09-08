@@ -1,10 +1,5 @@
 import pg from 'pg'
-
-function readDatabaseUrl() {
-  return String(process.env.DATABASE_URL || '')
-    .trim()
-    .replace(/^['"]|['"]$/g, '')
-}
+import { databaseHost, libpqParams, readDatabaseUrl } from './url.js'
 
 function useSsl(url) {
   if (process.env.DATABASE_SSL === 'false') return false
@@ -44,6 +39,17 @@ function poolConfig() {
       ssl: useSsl(connectionString) ? { rejectUnauthorized: false } : undefined,
     }
   } catch {
+    const params = libpqParams(connectionString)
+    if (params.host) {
+      return {
+        host: params.host,
+        port: params.port ? Number(params.port) : 5432,
+        user: params.user,
+        password: params.password,
+        database: params.dbname || params.database || 'railway',
+        ssl: useSsl(connectionString) ? { rejectUnauthorized: false } : undefined,
+      }
+    }
     return {
       connectionString,
       ssl: useSsl(connectionString) ? { rejectUnauthorized: false } : undefined,
@@ -51,15 +57,7 @@ function poolConfig() {
   }
 }
 
-export function databaseHost() {
-  const connectionString = readDatabaseUrl()
-  if (!connectionString) return null
-  try {
-    return new URL(connectionString.replace(/^postgres:\/\//, 'postgresql://')).hostname
-  } catch {
-    return null
-  }
-}
+export { databaseHost }
 
 const pool = new pg.Pool(poolConfig())
 
