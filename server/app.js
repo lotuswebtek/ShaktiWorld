@@ -14,7 +14,8 @@ import eventsRoutes from './routes/events.js'
 import eventRsvpRoutes from './routes/eventRsvp.js'
 import resourcesRoutes from './routes/resources.js'
 import moderationRoutes from './routes/moderation.js'
-import pool, { databaseHost } from './db/pool.js'
+import requireVerified from './middleware/requireVerified.js'
+import noCache from './middleware/noCache.js'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const DATA_DIR = process.env.VERCEL
@@ -50,7 +51,14 @@ function isPublicApi(req) {
 const app = express()
 app.set('trust proxy', 1)
 
-const clerk = process.env.CLERK_SECRET_KEY ? clerkMiddleware() : null
+let clerk = null
+try {
+  if (process.env.CLERK_SECRET_KEY) {
+    clerk = clerkMiddleware()
+  }
+} catch (err) {
+  console.error('Clerk middleware was not created:', err instanceof Error ? err.message : 'unknown')
+}
 
 app.use((req, res, next) => {
   if (isPublicApi(req) || !clerk) return next()

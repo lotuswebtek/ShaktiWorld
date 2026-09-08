@@ -1,8 +1,21 @@
-import app from '../server/app.js'
-import { databaseHost } from '../server/db/pool.js'
-
 export const config = {
   maxDuration: 30,
+}
+
+function readDatabaseUrl() {
+  return String(process.env.DATABASE_URL || '')
+    .trim()
+    .replace(/^['"]|['"]$/g, '')
+}
+
+function databaseHost() {
+  const connectionString = readDatabaseUrl()
+  if (!connectionString) return null
+  try {
+    return new URL(connectionString.replace(/^postgres:\/\//, 'postgresql://')).hostname
+  } catch {
+    return null
+  }
 }
 
 function requestPath(req) {
@@ -30,36 +43,42 @@ function requestPath(req) {
   return `/api${url.startsWith('/') ? url : `/${url}`}`
 }
 
-export default function handler(req, res) {
+function sendJson(res, status, body) {
+  res.statusCode = status
+  res.setHeader('Content-Type', 'application/json')
+  res.end(JSON.stringify(body))
+}
+
+export default async function handler(req, res) {
   try {
     req.url = requestPath(req)
     const pathOnly = String(req.url).split('?')[0]
 
     if (req.method === 'GET' && (pathOnly === '/api/health' || pathOnly === '/health' || pathOnly === '/api')) {
-      res.statusCode = 200
-      res.setHeader('Content-Type', 'application/json')
-      res.end(
-        JSON.stringify({
-          ok: true,
-          name: 'Shaktiworld API',
-          db: Boolean(process.env.DATABASE_URL),
-          dbHost: databaseHost(),
-          clerk: Boolean(process.env.CLERK_SECRET_KEY),
-        }),
-      )
+      const host = databaseHost()
+      sendJson(res, 200, {
+        ok: true,
+        name: 'Shaktiworld API',
+        db: Boolean(readDatabaseUrl()),
+        dbHost: host,
+        clerk: Boolean(process.env.CLERK_SECRET_KEY),
+        dbHint:
+          !host
+            ? 'Set DATABASE_URL in Vercel to Railway DATABASE_PUBLIC_URL.'
+            : host === 'base' || host.endsWith('.railway.internal')
+              ? 'DATABASE_URL host is not reachable from Vercel. Use Railway DATABASE_PUBLIC_URL (host ends with proxy.rlwy.net).'
+              : null,
+      })
       return
     }
 
+    const { default: app } = await import('../server/app.js')
     return app(req, res)
   } catch (err) {
     if (res.headersSent) return
-    res.statusCode = 500
-    res.setHeader('Content-Type', 'application/json')
-    res.end(
-      JSON.stringify({
-        message: 'Internal error.',
-        detail: err instanceof Error ? err.message : 'Unknown error',
-      }),
-    )
+    sendJson(res, 500, {
+      message: 'Internal error.',
+      detail: err instanceof Error ? err.message : 'Unknown error',
+    })
   }
 }

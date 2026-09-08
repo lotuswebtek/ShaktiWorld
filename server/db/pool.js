@@ -13,10 +13,24 @@ function useSsl(url) {
   return /railway|rlwy\.net|supabase/i.test(url)
 }
 
+function safeDecode(value) {
+  try {
+    return decodeURIComponent(value)
+  } catch {
+    return value
+  }
+}
+
 function poolConfig() {
   const connectionString = readDatabaseUrl()
   if (!connectionString) {
-    return { connectionString: '' }
+    return {
+      host: '127.0.0.1',
+      port: 5432,
+      user: 'unused',
+      password: 'unused',
+      database: 'unused',
+    }
   }
 
   try {
@@ -24,9 +38,9 @@ function poolConfig() {
     return {
       host: url.hostname,
       port: url.port ? Number(url.port) : 5432,
-      user: decodeURIComponent(url.username),
-      password: decodeURIComponent(url.password),
-      database: decodeURIComponent(url.pathname.replace(/^\//, '')) || 'railway',
+      user: safeDecode(url.username),
+      password: safeDecode(url.password),
+      database: safeDecode(url.pathname.replace(/^\//, '')) || 'railway',
       ssl: useSsl(connectionString) ? { rejectUnauthorized: false } : undefined,
     }
   } catch {
