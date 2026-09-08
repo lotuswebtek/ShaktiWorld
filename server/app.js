@@ -1,10 +1,11 @@
 import './clerkEnv.js'
 import express from 'express'
 import cors from 'cors'
-import { clerkClient, clerkMiddleware, getAuth } from '@clerk/express'
+import { clerkClient, clerkMiddleware } from '@clerk/express'
 import fs from 'fs'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { attachBearerAuth, clerkMiddlewareOptions, getRequestUserId } from './auth.js'
 import { databaseHost } from './db/pool.js'
 import onboardingRoutes from './routes/onboarding.js'
 import supportRoutes from './routes/support.js'
@@ -38,15 +39,9 @@ function writeJson(file, data) {
   fs.writeFileSync(path.join(DATA_DIR, file), JSON.stringify(data, null, 2))
 }
 
-function isPublicApi(req) {
+function isHealth(req) {
   const pathOnly = String(req.url || '').split('?')[0]
-  if (req.method !== 'GET') return false
-  return (
-    pathOnly === '/api/health' ||
-    pathOnly === '/health' ||
-    pathOnly.startsWith('/api/events') ||
-    pathOnly.startsWith('/api/resources')
-  )
+  return pathOnly === '/api/health' || pathOnly === '/health'
 }
 
 const app = express()
@@ -55,16 +50,22 @@ app.set('trust proxy', 1)
 let clerk = null
 try {
   if (process.env.CLERK_SECRET_KEY) {
-    clerk = clerkMiddleware()
+    clerk = clerkMiddleware(clerkMiddlewareOptions())
   }
 } catch (err) {
   console.error('Clerk middleware was not created:', err instanceof Error ? err.message : 'unknown')
 }
 
 app.use((req, res, next) => {
-  if (isPublicApi(req) || !clerk) return next()
-  return clerk(req, res, next)
+  if (isHealth(req) || !clerk) return next()
+  return clerk(req, res, (err) => {
+    if (err) {
+      console.error('Clerk middleware:', err instanceof Error ? err.message : 'unknown')
+    }
+    next()
+  })
 })
+app.use(attachBearerAuth)
 app.use(cors({ origin: true, credentials: true }))
 app.use(express.json({ limit: '1mb' }))
 
@@ -92,8 +93,8 @@ app.use('/api/community/events', eventRsvpRoutes)
 app.use('/api/moderation', moderationRoutes)
 
 app.get('/api/me', async (req, res) => {
-  const { isAuthenticated, userId } = getAuth(req)
-  if (!isAuthenticated) {
+  const userId = await getRequestUserId(req)
+  if (!userId) {
     return res.status(401).json({ message: 'Please log in to continue.' })
   }
 

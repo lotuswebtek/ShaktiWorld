@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@clerk/react'
 
-import { API } from '../config/env.js'
+import { fetchWithClerkToken } from '../lib/authFetch.js'
 
 /**
  * Fetches the user's onboarding status from the server and
@@ -22,12 +22,15 @@ export default function useOnboarding() {
     }
     setLoading(true)
     try {
-      const token = await getToken()
-      const res = await fetch(`${API}/api/onboarding/status`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const res = await fetchWithClerkToken('/api/onboarding/status', getToken)
       const data = await res.json().catch(() => ({}))
-      if (!res.ok) throw new Error(data.message || 'Failed to fetch status')
+      if (!res.ok) {
+        throw new Error(
+          res.status === 401
+            ? 'Session expired. Sign in again to continue.'
+            : data.message || 'Failed to fetch status',
+        )
+      }
       setStatus(data)
       setError(null)
     } catch (err) {
@@ -42,13 +45,9 @@ export default function useOnboarding() {
   }, [fetchStatus])
 
   const submitProfile = async (profileData) => {
-    const token = await getToken()
-    const res = await fetch(`${API}/api/onboarding/profile`, {
+    const res = await fetchWithClerkToken('/api/onboarding/profile', getToken, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(profileData),
     })
     const data = await res.json()
@@ -58,14 +57,12 @@ export default function useOnboarding() {
   }
 
   const uploadId = async (documentType, file) => {
-    const token = await getToken()
     const form = new FormData()
     form.append('documentType', documentType)
     form.append('document', file)
 
-    const res = await fetch(`${API}/api/onboarding/upload-id`, {
+    const res = await fetchWithClerkToken('/api/onboarding/upload-id', getToken, {
       method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
       body: form,
     })
     const data = await res.json()

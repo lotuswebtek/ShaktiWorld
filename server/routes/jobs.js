@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getAuth } from '@clerk/express'
+import { getRequestUserId } from '../auth.js'
 import pool from '../db/pool.js'
 
 const router = Router()
@@ -33,7 +33,7 @@ function within60Days(createdAt, expiryAt) {
 // Member posts an opportunity.
 // ───────────────────────────────────────────────
 router.post('/opportunities', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   const {
@@ -120,7 +120,7 @@ router.post('/opportunities', async (req, res) => {
 //  - contact details are intentionally NOT returned.
 // ───────────────────────────────────────────────
 router.get('/opportunities', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   const { city, skill, workMode } = req.query || {}
@@ -190,7 +190,7 @@ router.get('/opportunities', async (req, res) => {
 // Member creates/updates her skills profile.
 // ───────────────────────────────────────────────
 router.post('/seekers', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   const {
@@ -266,7 +266,7 @@ router.post('/seekers', async (req, res) => {
 //  - workMode: remote|onsite|either
 // ───────────────────────────────────────────────
 router.get('/seekers', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   const { city, skill, workMode } = req.query || {}
@@ -340,7 +340,7 @@ router.get('/seekers', async (req, res) => {
 // Contact details are returned only in this endpoint.
 // ───────────────────────────────────────────────
 router.post('/contact/reveal', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   const { targetType, targetId } = req.body || {}

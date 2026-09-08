@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getAuth } from '@clerk/express'
+import { getRequestUserId } from '../auth.js'
 import pool from '../db/pool.js'
 
 const router = Router()
@@ -31,7 +31,7 @@ function isNewAccount(user) {
 // Feed of approved listening posts, newest first.
 // ───────────────────────────────────────────────
 router.get('/', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   let client
   try {
     client = await pool.connect()
@@ -77,7 +77,7 @@ router.get('/', async (req, res) => {
 // New accounts (< 7 days) go to pre-publication review.
 // ───────────────────────────────────────────────
 router.post('/', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   const { title, body, isAnonymous } = req.body || {}
@@ -141,7 +141,7 @@ router.post('/', async (req, res) => {
 // Single post with replies.
 // ───────────────────────────────────────────────
 router.get('/:postId', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   let client
   try {
     client = await pool.connect()
@@ -246,7 +246,7 @@ router.get('/:postId', async (req, res) => {
 // Add a reply (one level deep — no nested replies).
 // ───────────────────────────────────────────────
 router.post('/:postId/replies', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   const { body, isAnonymous } = req.body || {}
@@ -290,7 +290,7 @@ router.post('/:postId/replies', async (req, res) => {
 // Toggle a supportive reaction on a post or reply.
 // ───────────────────────────────────────────────
 router.post('/react', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   const { targetType, targetId, reaction } = req.body || {}
@@ -339,7 +339,7 @@ router.post('/react', async (req, res) => {
 // Report a post or reply to the moderation queue.
 // ───────────────────────────────────────────────
 router.post('/report', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   const { targetType, targetId, reason } = req.body || {}

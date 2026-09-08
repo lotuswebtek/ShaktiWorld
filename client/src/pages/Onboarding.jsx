@@ -1,5 +1,5 @@
 import { useAuth } from '@clerk/react'
-import { Navigate } from 'react-router-dom'
+import { Link, Navigate } from 'react-router-dom'
 import useOnboarding from '../hooks/useOnboarding.js'
 import ProfileForm from '../components/onboarding/ProfileForm.jsx'
 import IdUpload from '../components/onboarding/IdUpload.jsx'
@@ -29,7 +29,9 @@ export default function Onboarding() {
         <div className="container" style={{ textAlign: 'center', padding: '4rem 0' }}>
           <p className="lede">
             {error
-              ? error
+              ? error === 'Not authenticated.'
+                ? 'Your session could not be verified. Try again, or sign in again.'
+                : error
               : 'Setting up your account…'}
           </p>
           {error && (
@@ -37,6 +39,8 @@ export default function Onboarding() {
               <button className="btn btn-solid" type="button" onClick={() => refresh()}>
                 Try again
               </button>
+              {' '}
+              <Link className="btn" to="/log-in">Sign in</Link>
             </p>
           )}
         </div>

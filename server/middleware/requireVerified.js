@@ -1,4 +1,4 @@
-import { getAuth } from '@clerk/express'
+import { getRequestUserId } from '../auth.js'
 import pool from '../db/pool.js'
 
 /**
@@ -8,7 +8,7 @@ import pool from '../db/pool.js'
  * Checked server-side against the database — not a client-side guard.
  */
 export default async function requireVerified(req, res, next) {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
 
   if (!userId) {
     return res.status(401).json({ message: 'Not authenticated.' })

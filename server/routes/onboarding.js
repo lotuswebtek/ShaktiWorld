@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import multer from 'multer'
-import { getAuth } from '@clerk/express'
+import { getRequestUserId } from '../auth.js'
 import pool from '../db/pool.js'
 import { uploadIdDocument } from '../storage.js'
 import { CURRENT_LEGAL } from '../legal.js'
@@ -54,7 +54,7 @@ const upload = multer({
 // client can route to the correct screen.
 // ───────────────────────────────────────────────
 router.get('/status', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   let client
@@ -159,7 +159,7 @@ router.get('/status', async (req, res) => {
 // Creates user + profile rows after Clerk signup.
 // ───────────────────────────────────────────────
 router.post('/profile', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   const { fullName, city, state, country, email, phone, whatsapp, bio, acceptedTermsVersion } =
@@ -245,7 +245,7 @@ router.post('/profile', async (req, res) => {
 // The ID number itself is NEVER stored.
 // ───────────────────────────────────────────────
 router.post('/upload-id', upload.single('document'), async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   const { documentType } = req.body || {}

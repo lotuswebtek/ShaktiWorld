@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getAuth } from '@clerk/express'
+import { getRequestUserId } from '../auth.js'
 import pool from '../db/pool.js'
 
 const router = Router()
@@ -13,7 +13,7 @@ const VALID_VISIBILITY = ['public', 'members_only', 'private_to_moderators']
 // Never sends email containing the request content.
 // ───────────────────────────────────────────────
 router.post('/', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   const { category, subject, body, visibility } = req.body || {}
@@ -72,7 +72,7 @@ router.post('/', async (req, res) => {
 // List the current user's own support requests.
 // ───────────────────────────────────────────────
 router.get('/mine', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   let client

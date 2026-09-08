@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getAuth } from '@clerk/express'
+import { getRequestUserId } from '../auth.js'
 import pool from '../db/pool.js'
 
 const router = Router()
@@ -13,7 +13,7 @@ async function resolveVerifiedUser(client, clerkId) {
 }
 
 router.post('/:id/rsvp', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   let client
@@ -89,7 +89,7 @@ router.post('/:id/rsvp', async (req, res) => {
 })
 
 router.delete('/:id/rsvp', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   let client

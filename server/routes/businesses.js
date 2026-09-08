@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getAuth } from '@clerk/express'
+import { getRequestUserId } from '../auth.js'
 import pool from '../db/pool.js'
 
 const router = Router()
@@ -42,7 +42,7 @@ router.get('/cities', async (_req, res) => {
 })
 
 router.get('/mine', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   let client
@@ -70,7 +70,7 @@ router.get('/mine', async (req, res) => {
 })
 
 router.post('/mine', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   if (!userId) return res.status(401).json({ message: 'Not authenticated.' })
 
   const {

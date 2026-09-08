@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getAuth } from '@clerk/express'
+import { getRequestUserId } from '../auth.js'
 import pool from '../db/pool.js'
 import { buildEventIcs, icsFilename } from '../ics.js'
 
@@ -90,7 +90,7 @@ router.get('/:id/ics', async (req, res) => {
 })
 
 router.get('/:id', async (req, res) => {
-  const { userId } = getAuth(req)
+  const userId = await getRequestUserId(req)
   let client
   try {
     client = await pool.connect()
