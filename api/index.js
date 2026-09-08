@@ -1,3 +1,4 @@
+import '../server/clerkEnv.js'
 import { databaseHost, readDatabaseUrl } from '../server/db/url.js'
 
 export const config = {

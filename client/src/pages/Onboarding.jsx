@@ -29,7 +29,7 @@ export default function Onboarding() {
         <div className="container" style={{ textAlign: 'center', padding: '4rem 0' }}>
           <p className="lede">
             {error
-              ? 'We could not reach the account service. Try again in a moment.'
+              ? error
               : 'Setting up your account…'}
           </p>
           {error && (

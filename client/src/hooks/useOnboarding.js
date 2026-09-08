@@ -26,8 +26,8 @@ export default function useOnboarding() {
       const res = await fetch(`${API}/api/onboarding/status`, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      if (!res.ok) throw new Error('Failed to fetch status')
-      const data = await res.json()
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.message || 'Failed to fetch status')
       setStatus(data)
       setError(null)
     } catch (err) {

@@ -146,7 +146,9 @@ router.get('/status', async (req, res) => {
     })
   } catch (err) {
     console.error('onboarding/status error:', err.message)
-    return res.status(500).json({ message: 'Internal error.' })
+    return res.status(500).json({
+      message: err.message || 'Internal error.',
+    })
   } finally {
     if (client) client.release()
   }

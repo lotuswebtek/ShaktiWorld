@@ -31,4 +31,12 @@ export function databaseHost() {
   }
 }
 
+export function isUsableDatabaseHost(host) {
+  if (!host) return false
+  const value = host.toLowerCase()
+  if (value === 'base' || value === 'localhost' || value === '127.0.0.1') return false
+  if (value.endsWith('.railway.internal')) return false
+  return true
+}
+
 export { readDatabaseUrl, libpqParams }

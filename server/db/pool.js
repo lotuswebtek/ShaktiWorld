@@ -1,5 +1,5 @@
 import pg from 'pg'
-import { databaseHost, libpqParams, readDatabaseUrl } from './url.js'
+import { databaseHost, isUsableDatabaseHost, libpqParams, readDatabaseUrl } from './url.js'
 
 function useSsl(url) {
   if (process.env.DATABASE_SSL === 'false') return false
@@ -18,9 +18,10 @@ function safeDecode(value) {
 
 function poolConfig() {
   const connectionString = readDatabaseUrl()
-  if (!connectionString) {
+  const host = databaseHost()
+  if (!isUsableDatabaseHost(host)) {
     return {
-      host: '127.0.0.1',
+      host: 'invalid-database-host.invalid',
       port: 5432,
       user: 'unused',
       password: 'unused',
@@ -60,5 +61,20 @@ function poolConfig() {
 export { databaseHost }
 
 const pool = new pg.Pool(poolConfig())
+const originalConnect = pool.connect.bind(pool)
+
+pool.connect = function connect(callback) {
+  if (!isUsableDatabaseHost(databaseHost())) {
+    const err = new Error(
+      'DATABASE_URL must be Railway DATABASE_PUBLIC_URL. In Railway Postgres → Variables, copy DATABASE_PUBLIC_URL (host ends with proxy.rlwy.net) into Vercel DATABASE_URL, then redeploy.',
+    )
+    if (typeof callback === 'function') {
+      callback(err)
+      return undefined
+    }
+    return Promise.reject(err)
+  }
+  return originalConnect(callback)
+}
 
 export default pool
