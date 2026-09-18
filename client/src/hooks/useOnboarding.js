@@ -1,15 +1,13 @@
-import { useState, useEffect, useCallback } from 'react'
+import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { useAuth } from '@clerk/react'
 
 import { fetchWithClerkToken } from '../lib/authFetch.js'
 
-/**
- * Fetches the user's onboarding status from the server and
- * exposes helpers for profile submission + ID upload.
- */
-export default function useOnboarding() {
+const OnboardingContext = createContext(null)
+
+function useOnboardingState() {
   const { isLoaded, isSignedIn, getToken } = useAuth()
-  const [status, setStatus] = useState(null) // { step, accountStatus, verificationStatus?, rejectionReason? }
+  const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -17,6 +15,7 @@ export default function useOnboarding() {
     if (!isLoaded) return
     if (!isSignedIn) {
       setStatus(null)
+      setError(null)
       setLoading(false)
       return
     }
@@ -34,7 +33,7 @@ export default function useOnboarding() {
       setStatus(data)
       setError(null)
     } catch (err) {
-      setError(err.message)
+      setError(err instanceof Error ? err.message : 'Failed to fetch status')
     } finally {
       setLoading(false)
     }
@@ -44,7 +43,7 @@ export default function useOnboarding() {
     fetchStatus()
   }, [fetchStatus])
 
-  const submitProfile = async (profileData) => {
+  const submitProfile = useCallback(async (profileData) => {
     const res = await fetchWithClerkToken('/api/onboarding/profile', getToken, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -54,9 +53,9 @@ export default function useOnboarding() {
     if (!res.ok) throw new Error(data.message || 'Profile submission failed')
     await fetchStatus()
     return data
-  }
+  }, [getToken, fetchStatus])
 
-  const uploadId = async (documentType, file) => {
+  const uploadId = useCallback(async (documentType, file) => {
     const form = new FormData()
     form.append('documentType', documentType)
     form.append('document', file)
@@ -69,7 +68,23 @@ export default function useOnboarding() {
     if (!res.ok) throw new Error(data.message || 'Upload failed')
     await fetchStatus()
     return data
-  }
+  }, [getToken, fetchStatus])
 
-  return { status, loading, error, submitProfile, uploadId, refresh: fetchStatus }
+  return useMemo(
+    () => ({ status, loading, error, submitProfile, uploadId, refresh: fetchStatus }),
+    [status, loading, error, submitProfile, uploadId, fetchStatus],
+  )
+}
+
+export function OnboardingProvider({ children }) {
+  const value = useOnboardingState()
+  return createElement(OnboardingContext.Provider, { value }, children)
+}
+
+export default function useOnboarding() {
+  const ctx = useContext(OnboardingContext)
+  if (!ctx) {
+    throw new Error('useOnboarding must be used within OnboardingProvider')
+  }
+  return ctx
 }

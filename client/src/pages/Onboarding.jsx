@@ -1,21 +1,39 @@
 import { useAuth } from '@clerk/react'
-import { Link, Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import useOnboarding from '../hooks/useOnboarding.js'
+import { CLERK_TIMEOUT_MESSAGE, useLoadTimeout } from '../hooks/useLoadTimeout.js'
 import ProfileForm from '../components/onboarding/ProfileForm.jsx'
 import IdUpload from '../components/onboarding/IdUpload.jsx'
 import VerificationStatus from '../components/onboarding/VerificationStatus.jsx'
+import { AccountGateMessage } from '../components/AccountGateMessage.jsx'
+import { peekReturnTo } from '../lib/returnTo.js'
+import { isStaff, memberHomePath } from '../lib/accountStatus.js'
+
+function VerifiedExit({ status }) {
+  return <Navigate to={peekReturnTo() || memberHomePath(status)} replace />
+}
 
 export default function Onboarding() {
   const { isLoaded, isSignedIn } = useAuth()
   const { status, loading, error, submitProfile, uploadId, refresh } = useOnboarding()
+  const clerkTimedOut = useLoadTimeout(isLoaded)
+
+  if (!isLoaded && clerkTimedOut) {
+    return (
+      <AccountGateMessage
+        error={error || CLERK_TIMEOUT_MESSAGE}
+        onRetry={() => window.location.reload()}
+      />
+    )
+  }
 
   if (!isLoaded || loading) {
     return (
-      <section className="section">
-        <div className="container" style={{ textAlign: 'center', padding: '4rem 0' }}>
-          <p className="lede">Loading your account…</p>
-        </div>
-      </section>
+      <AccountGateMessage
+        loading
+        title="Opening your member space"
+        message="Loading your account…"
+      />
     )
   }
 
@@ -24,35 +42,32 @@ export default function Onboarding() {
   }
 
   if (!status) {
+    if (!error) {
+      return (
+        <AccountGateMessage
+          loading
+          title="Opening your member space"
+          message="Setting up your account…"
+        />
+      )
+    }
     return (
-      <section className="section">
-        <div className="container" style={{ textAlign: 'center', padding: '4rem 0' }}>
-          <p className="lede">
-            {error
-              ? error === 'Not authenticated.'
-                ? 'Your session could not be verified. Try again, or sign in again.'
-                : error
-              : 'Setting up your account…'}
-          </p>
-          {error && (
-            <p>
-              <button className="btn btn-solid" type="button" onClick={() => refresh()}>
-                Try again
-              </button>
-              {' '}
-              <Link className="btn" to="/log-in">Sign in</Link>
-            </p>
-          )}
-        </div>
-      </section>
+      <AccountGateMessage
+        error={
+          error === 'Not authenticated.'
+            ? 'Your session could not be verified. Try again, or sign in again.'
+            : error
+        }
+        onRetry={() => refresh()}
+      />
     )
   }
 
-  // Already verified, or staff — leave the holding flow
-  if (status.accountStatus === 'verified' || status.role === 'admin' || status.role === 'moderator') {
-    if (status.step !== 'profile') {
-      return <Navigate to={status.role === 'admin' || status.role === 'moderator' ? '/moderation/verifications' : '/career'} replace />
-    }
+  if (
+    (status.accountStatus === 'verified' || isStaff(status)) &&
+    status.step !== 'profile'
+  ) {
+    return <VerifiedExit status={status} />
   }
 
   if (status.step === 'profile') {
@@ -68,6 +83,5 @@ export default function Onboarding() {
     )
   }
 
-  // waiting / submitted / under_review / approved-but-not-yet-verified
   return <VerificationStatus status={status} onRefresh={refresh} />
 }

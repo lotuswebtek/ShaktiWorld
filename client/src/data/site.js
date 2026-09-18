@@ -18,7 +18,7 @@ export const navLinks = [
   { to: '/our-events', label: 'Our Events' },
   { to: '/community/resources', label: 'Resources' },
   { to: '/work-with-us', label: 'Work With Us' },
-  { to: '/services', label: 'Services', membersOnly: true },
+  { to: '/services', label: 'Services' },
   { to: '/listening', label: 'Listening', membersOnly: true },
   { to: '/community/businesses', label: 'Businesses', membersOnly: true },
   { to: '/career', label: 'Career', membersOnly: true },

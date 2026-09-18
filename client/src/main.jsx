@@ -5,6 +5,7 @@ import { ClerkProvider } from '@clerk/react'
 import App from './App.jsx'
 import { clerkAppearance } from './clerkAppearance.js'
 import { CLERK_PUBLISHABLE_KEY } from './config/env.js'
+import { OnboardingProvider } from './hooks/useOnboarding.js'
 import './index.css'
 
 function Root() {
@@ -22,7 +23,9 @@ function Root() {
       routerReplace={(to) => navigate(to, { replace: true })}
       appearance={clerkAppearance}
     >
-      <App />
+      <OnboardingProvider>
+        <App />
+      </OnboardingProvider>
     </ClerkProvider>
   )
 }

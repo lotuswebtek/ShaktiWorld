@@ -1,7 +1,12 @@
+import { useEffect } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
 import useOnboarding from '../hooks/useOnboarding.js'
+import { CLERK_TIMEOUT_MESSAGE, useLoadTimeout } from '../hooks/useLoadTimeout.js'
 import { memberRegisterPath } from './NavItem.jsx'
+import { AccountGateMessage } from './AccountGateMessage.jsx'
+import { consumeReturnTo, peekReturnTo, rememberReturnTo } from '../lib/returnTo.js'
+import { canAccessMembers } from '../lib/accountStatus.js'
 
 /**
  * Wraps member-only pages. Checks:
@@ -10,30 +15,46 @@ import { memberRegisterPath } from './NavItem.jsx'
  */
 export default function RequireAuth({ children }) {
   const { isLoaded, isSignedIn } = useAuth()
-  const { status, loading } = useOnboarding()
+  const { status, loading, error, refresh } = useOnboarding()
   const location = useLocation()
+  const clerkTimedOut = useLoadTimeout(isLoaded)
+
+  useEffect(() => {
+    if (canAccessMembers(status) && peekReturnTo() === location.pathname) {
+      consumeReturnTo(location.pathname)
+    }
+  }, [status, location.pathname])
+
+  if (!isLoaded && clerkTimedOut) {
+    return (
+      <AccountGateMessage
+        error={error || CLERK_TIMEOUT_MESSAGE}
+        onRetry={() => window.location.reload()}
+      />
+    )
+  }
 
   if (!isLoaded || loading) {
     return (
-      <section className="section">
-        <div className="container">
-          <p className="lede">Opening your member space…</p>
-        </div>
-      </section>
+      <AccountGateMessage
+        loading
+        title="Opening your member space"
+        message="Loading your account…"
+      />
     )
   }
 
   if (!isSignedIn) {
-    sessionStorage.setItem('sw_next', location.pathname)
+    rememberReturnTo(location.pathname)
     return <Navigate to={memberRegisterPath(location.pathname)} replace />
   }
 
-  // Staff may use moderation tools before identity verification is complete.
-  const isStaff = status?.role === 'admin' || status?.role === 'moderator'
-  const isVerifiedMember =
-    status?.step === 'complete' && status?.accountStatus === 'verified'
+  if (error && !status) {
+    return <AccountGateMessage error={error} onRetry={() => refresh()} />
+  }
 
-  if (!status || (!isStaff && !isVerifiedMember)) {
+  if (!canAccessMembers(status)) {
+    rememberReturnTo(location.pathname)
     return <Navigate to="/onboarding" replace />
   }
 

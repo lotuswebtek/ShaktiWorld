@@ -61,6 +61,8 @@ export default function Register() {
                 <SignUp
                   path="/register"
                   signInUrl="/log-in"
+                  forceRedirectUrl="/onboarding"
+                  fallbackRedirectUrl="/onboarding"
                   unsafeMetadata={clerkUnsafeMetadataFromConsent(consentRecord)}
                 />
               </div>

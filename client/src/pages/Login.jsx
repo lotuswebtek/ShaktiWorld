@@ -15,7 +15,12 @@ export default function Login() {
           <p className="lede">Sign in to continue creating, connecting, and empowering.</p>
           {CLERK_PUBLISHABLE_KEY ? (
             <div className="clerk-wrap">
-              <SignIn path="/log-in" signUpUrl="/register" />
+              <SignIn
+                path="/log-in"
+                signUpUrl="/register"
+                forceRedirectUrl="/onboarding"
+                fallbackRedirectUrl="/onboarding"
+              />
             </div>
           ) : (
             <p className="legal-consent-hint">
