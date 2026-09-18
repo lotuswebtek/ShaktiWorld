@@ -12,7 +12,7 @@ import { KolamCorner } from './KolamBorder.jsx'
  */
 export default function AppFooter() {
   const { isSignedIn } = useAuth()
-  const visibleLinks = navLinks.filter((item) => !item.membersOnly || isSignedIn)
+  const visibleLinks = navLinks
 
   return (
     <footer className="ds-footer">

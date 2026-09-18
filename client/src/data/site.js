@@ -21,9 +21,9 @@ export const navLinks = [
   { to: '/services', label: 'Services' },
   { to: '/listening', label: 'Listening', membersOnly: true },
   { to: '/community/businesses', label: 'Businesses', membersOnly: true },
-  { to: '/career', label: 'Career', membersOnly: true },
+  { to: '/career', label: 'Career' },
   { to: '/community/jobs', label: 'Jobs', membersOnly: true },
-  { to: '/training', label: 'Training', membersOnly: true },
+  { to: '/training', label: 'Training' },
   { to: '/contact-us', label: 'Contact Us' },
 ]
 

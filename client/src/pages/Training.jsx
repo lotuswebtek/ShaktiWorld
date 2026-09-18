@@ -1,12 +1,11 @@
 import { Link } from 'react-router-dom'
-import RequireAuth from '../components/RequireAuth.jsx'
 import { memberAreas } from '../data/site.js'
 
 const area = memberAreas.training
 
 export default function Training() {
   return (
-    <RequireAuth>
+    <>
       <section className="page-hero">
         <img src={area.image} alt="Women learning together" />
         <div className="page-hero-copy">
@@ -75,6 +74,6 @@ export default function Training() {
           </div>
         </div>
       </section>
-    </RequireAuth>
+    </>
   )
 }

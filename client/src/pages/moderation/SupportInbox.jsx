@@ -73,7 +73,7 @@ export default function SupportInbox() {
   }
 
   return (
-    <RequireAuth>
+    <RequireAuth waitForStatus>
       <section className="section">
         <div className="container">
           <p className="eyebrow">Moderation</p>

@@ -9,6 +9,8 @@ export function AccountGateMessage({
   title = 'Opening your member space',
   message = 'Loading your account…',
   onRetry,
+  continueTo = '/services',
+  continueLabel = 'Continue to Services',
 }) {
   return (
     <section className="section">
@@ -29,6 +31,11 @@ export function AccountGateMessage({
               <Link className="btn" to="/log-in">
                 Sign in
               </Link>
+              {error && continueTo && (
+                <Link className="btn btn-ghost" to={continueTo}>
+                  {continueLabel}
+                </Link>
+              )}
             </p>
           )}
         </div>

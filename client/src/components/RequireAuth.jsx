@@ -9,13 +9,13 @@ import { consumeReturnTo, peekReturnTo, rememberReturnTo } from '../lib/returnTo
 import { canAccessMembers } from '../lib/accountStatus.js'
 
 /**
- * Wraps member-only pages. Checks:
- * 1. User is signed in (redirects to register if not).
- * 2. User has completed onboarding and is verified (redirects to /onboarding if not).
+ * Wraps member-only pages.
+ * Signed-in members see the page immediately. We only send them to onboarding
+ * after a successful status response says they still need to finish setup.
  */
-export default function RequireAuth({ children }) {
+export default function RequireAuth({ children, waitForStatus = false }) {
   const { isLoaded, isSignedIn } = useAuth()
-  const { status, loading, error, refresh } = useOnboarding()
+  const { status, loading } = useOnboarding()
   const location = useLocation()
   const clerkTimedOut = useLoadTimeout(isLoaded)
 
@@ -25,16 +25,17 @@ export default function RequireAuth({ children }) {
     }
   }, [status, location.pathname])
 
-  if (!isLoaded && clerkTimedOut) {
-    return (
-      <AccountGateMessage
-        error={error || CLERK_TIMEOUT_MESSAGE}
-        onRetry={() => window.location.reload()}
-      />
-    )
-  }
-
-  if (!isLoaded || loading) {
+  if (!isLoaded) {
+    if (clerkTimedOut) {
+      return (
+        <AccountGateMessage
+          error={CLERK_TIMEOUT_MESSAGE}
+          onRetry={() => window.location.reload()}
+          continueTo="/services"
+          continueLabel="Continue to Services"
+        />
+      )
+    }
     return (
       <AccountGateMessage
         loading
@@ -49,11 +50,17 @@ export default function RequireAuth({ children }) {
     return <Navigate to={memberRegisterPath(location.pathname)} replace />
   }
 
-  if (error && !status) {
-    return <AccountGateMessage error={error} onRetry={() => refresh()} />
+  if (waitForStatus && loading) {
+    return (
+      <AccountGateMessage
+        loading
+        title="Opening your member space"
+        message="Loading your account…"
+      />
+    )
   }
 
-  if (!canAccessMembers(status)) {
+  if (status && !canAccessMembers(status)) {
     rememberReturnTo(location.pathname)
     return <Navigate to="/onboarding" replace />
   }

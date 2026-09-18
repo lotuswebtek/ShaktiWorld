@@ -119,7 +119,7 @@ export default function VerificationInbox() {
   }
 
   return (
-    <RequireAuth>
+    <RequireAuth waitForStatus>
       <section className="section">
         <div className="container">
           <p className="eyebrow">Moderation</p>

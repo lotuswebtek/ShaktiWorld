@@ -104,7 +104,7 @@ export default function SupportDetail() {
 
   if (loading) {
     return (
-      <RequireAuth>
+      <RequireAuth waitForStatus>
         <section className="section">
           <div className="container">
             <p className="lede">Loading request…</p>
@@ -116,7 +116,7 @@ export default function SupportDetail() {
 
   if (error || !detail) {
     return (
-      <RequireAuth>
+      <RequireAuth waitForStatus>
         <section className="section">
           <div className="container">
             <p className="form-error">{error || 'Request not found.'}</p>
@@ -130,7 +130,7 @@ export default function SupportDetail() {
   }
 
   return (
-    <RequireAuth>
+    <RequireAuth waitForStatus>
       <section className="section">
         <div className="container" style={{ maxWidth: 780 }}>
           <Link to="/moderation/support" className="mod-back-link">← Back to inbox</Link>

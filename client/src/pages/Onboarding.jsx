@@ -23,6 +23,8 @@ export default function Onboarding() {
       <AccountGateMessage
         error={error || CLERK_TIMEOUT_MESSAGE}
         onRetry={() => window.location.reload()}
+        continueTo="/services"
+        continueLabel="Continue to Services"
       />
     )
   }
@@ -59,6 +61,8 @@ export default function Onboarding() {
             : error
         }
         onRetry={() => refresh()}
+        continueTo={peekReturnTo() || '/services'}
+        continueLabel="Continue to the site"
       />
     )
   }

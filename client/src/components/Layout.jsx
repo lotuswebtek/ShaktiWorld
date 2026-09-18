@@ -30,7 +30,7 @@ export default function Layout() {
   const { isSignedIn } = useAuth()
   const { status } = useOnboarding()
   const location = useLocation()
-  const visibleLinks = navLinks.filter((item) => !item.membersOnly || isSignedIn)
+  const visibleLinks = navLinks
   const isStaff = status?.role === 'admin' || status?.role === 'moderator'
   const showSafety = SAFETY_PREFIXES.some((p) => location.pathname.startsWith(p))
   const close = () => setOpen(false)

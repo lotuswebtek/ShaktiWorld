@@ -16,7 +16,7 @@ import { KolamBorder } from './KolamBorder.jsx'
 export default function AppHeader() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { isSignedIn } = useAuth()
-  const visibleLinks = navLinks.filter((item) => !item.membersOnly || isSignedIn)
+  const visibleLinks = navLinks
 
   return (
     <header className="ds-header">
