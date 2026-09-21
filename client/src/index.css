@@ -1340,41 +1340,6 @@ p {
   margin-top: 1.5rem;
 }
 
-/* ── Quick Exit button ── */
-
-.quick-exit {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.55rem 1.1rem;
-  border: none;
-  border-radius: 999px;
-  background: #c0392b;
-  color: #fff;
-  font-family: Outfit, system-ui, sans-serif;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
-  box-shadow: 0 2px 12px rgba(192, 57, 43, 0.35);
-  transition: background 0.15s, transform 0.15s;
-}
-
-.quick-exit:hover {
-  background: #a93226;
-  transform: scale(1.04);
-}
-
-.quick-exit-icon {
-  font-size: 1rem;
-  line-height: 1;
-}
-
 /* ── Crisis Banner ── */
 
 .crisis-banner {
@@ -1511,12 +1476,6 @@ p {
 }
 
 @media (max-width: 640px) {
-  .quick-exit {
-    top: auto;
-    bottom: 12px;
-    right: 12px;
-  }
-
   .crisis-banner-inner {
     flex-direction: column;
     align-items: flex-start;

@@ -8,7 +8,6 @@ import PostAuthRedirect from './PostAuthRedirect.jsx'
 import RevealObserver from './RevealObserver.jsx'
 import SocialIcons from './SocialIcons.jsx'
 import WhatsAppJoin from './WhatsAppJoin.jsx'
-import QuickExit from './safety/QuickExit.jsx'
 import CrisisBanner from './safety/CrisisBanner.jsx'
 import useOnboarding from '../hooks/useOnboarding.js'
 
@@ -115,7 +114,6 @@ export default function Layout() {
       </aside>
 
       {isSignedIn && <SocialIcons variant="float" />}
-      {showSafety && <QuickExit />}
       {showSafety && <CrisisBanner />}
 
       <main>
