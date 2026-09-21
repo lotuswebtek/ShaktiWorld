@@ -96,10 +96,13 @@ export default function Layout() {
             <NavItem key={item.to} {...item} end={item.to === '/'} onClick={close} />
           ))}
           {isStaff && (
-            <NavItem to="/moderation/verifications" label="Verify members" onClick={close} />
-          )}
-          {status?.role === 'admin' && (
-            <NavItem to="/moderation/content" label="Post event" onClick={close} />
+            <>
+              <p className="nav-staff-label">Moderation</p>
+              <NavItem to="/moderation/verifications" label="Verify members" onClick={close} />
+              {status?.role === 'admin' && (
+                <NavItem to="/moderation/content" label="Post event" onClick={close} />
+              )}
+            </>
           )}
         </nav>
 

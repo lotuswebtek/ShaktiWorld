@@ -283,6 +283,15 @@ p {
   background: var(--cream);
 }
 
+.nav-staff-label {
+  margin: 1rem 0.65rem 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--burgundy);
+}
+
 .nav-cta {
   display: flex;
   flex-direction: column;

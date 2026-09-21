@@ -2,6 +2,7 @@ import { Router } from 'express'
 import { getRequestUserId } from '../auth.js'
 import pool from '../db/pool.js'
 import { readIdDocument, mimeFromStorageKey } from '../storage.js'
+import { ensureConfiguredAdmin } from '../staff.js'
 
 const router = Router()
 
@@ -22,6 +23,7 @@ async function requireStaff(req, res, next) {
   let client
   try {
     client = await pool.connect()
+    await ensureConfiguredAdmin(client, userId)
     const { rows } = await client.query(
       'SELECT id, role FROM users WHERE clerk_id = $1',
       [userId],

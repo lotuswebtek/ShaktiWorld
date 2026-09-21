@@ -4,6 +4,7 @@ import { getRequestUserId } from '../auth.js'
 import pool from '../db/pool.js'
 import { uploadIdDocument } from '../storage.js'
 import { CURRENT_LEGAL } from '../legal.js'
+import { ensureConfiguredAdmin } from '../staff.js'
 
 async function recordCurrentConsent(client, dbUserId) {
   const acceptedAt = new Date()
@@ -60,6 +61,7 @@ router.get('/status', async (req, res) => {
   let client
   try {
     client = await pool.connect()
+    await ensureConfiguredAdmin(client, userId)
 
     // Check if user row exists
     const { rows: userRows } = await client.query(
