@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
-import { useAuth } from '@clerk/react'
+import { useAuth, useUser } from '@clerk/react'
 import { footerLinks, navLinks, site } from '../data/site.js'
 import AuthButtons from './AuthButtons.jsx'
 import NavItem from './NavItem.jsx'
@@ -10,6 +10,7 @@ import SocialIcons from './SocialIcons.jsx'
 import WhatsAppJoin from './WhatsAppJoin.jsx'
 import CrisisBanner from './safety/CrisisBanner.jsx'
 import useOnboarding from '../hooks/useOnboarding.js'
+import { clerkUserIsStaff } from '../config/staff.js'
 
 const SAFETY_PREFIXES = [
   '/services',
@@ -27,10 +28,13 @@ const SAFETY_PREFIXES = [
 export default function Layout() {
   const [open, setOpen] = useState(false)
   const { isSignedIn } = useAuth()
+  const { user } = useUser()
   const { status } = useOnboarding()
   const location = useLocation()
   const visibleLinks = navLinks
-  const isStaff = status?.role === 'admin' || status?.role === 'moderator'
+  const isAdmin = status?.role === 'admin' || clerkUserIsStaff(user)
+  const isStaff = isAdmin || status?.role === 'moderator'
+  const showStaffNav = Boolean(isSignedIn && (isStaff || status?.role !== 'member'))
   const showSafety = SAFETY_PREFIXES.some((p) => location.pathname.startsWith(p))
   const close = () => setOpen(false)
 
@@ -62,17 +66,24 @@ export default function Layout() {
           </span>
         </Link>
 
-        <button
-          className={`menu-toggle ${open ? 'open' : ''}`}
-          type="button"
-          aria-label={open ? 'Close menu' : 'Open menu'}
-          aria-expanded={open}
-          onClick={() => setOpen((v) => !v)}
-        >
-          <span />
-          <span />
-          <span />
-        </button>
+        <div className="header-actions">
+          {showStaffNav && (
+            <Link to="/moderation/verifications" className="header-staff-link" onClick={close}>
+              Verify members
+            </Link>
+          )}
+          <button
+            className={`menu-toggle ${open ? 'open' : ''}`}
+            type="button"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+            onClick={() => setOpen((v) => !v)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
       </header>
 
       {open && (
@@ -95,11 +106,11 @@ export default function Layout() {
           {visibleLinks.map((item) => (
             <NavItem key={item.to} {...item} end={item.to === '/'} onClick={close} />
           ))}
-          {isStaff && (
+          {showStaffNav && (
             <>
               <p className="nav-staff-label">Moderation</p>
               <NavItem to="/moderation/verifications" label="Verify members" onClick={close} />
-              {status?.role === 'admin' && (
+              {isAdmin && (
                 <NavItem to="/moderation/content" label="Post event" onClick={close} />
               )}
             </>
@@ -110,6 +121,11 @@ export default function Layout() {
           {!isSignedIn && <SocialIcons />}
           {isSignedIn && (
             <div className="nav-cta">
+              {showStaffNav && (
+                <Link className="btn btn-solid" to="/moderation/verifications" onClick={close}>
+                  Verify members
+                </Link>
+              )}
               <AuthButtons onNavigate={close} />
             </div>
           )}

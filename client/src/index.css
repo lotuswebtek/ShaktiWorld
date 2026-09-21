@@ -161,6 +161,30 @@ p {
   border-bottom: 1px solid var(--line);
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-shrink: 0;
+}
+
+.header-staff-link {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--white);
+  background: var(--burgundy);
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.header-staff-link:hover {
+  color: var(--white);
+  opacity: 0.92;
+}
+
 .brand {
   display: flex;
   align-items: center;
