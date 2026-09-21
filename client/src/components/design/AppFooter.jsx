@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
-import { navLinks, site } from '../../data/site.js'
+import { footerLinks, site } from '../../data/site.js'
 import SocialIcons from '../SocialIcons.jsx'
 import NavItem from '../NavItem.jsx'
 import KolamDivider from './KolamDivider.jsx'
@@ -12,7 +12,6 @@ import { KolamCorner } from './KolamBorder.jsx'
  */
 export default function AppFooter() {
   const { isSignedIn } = useAuth()
-  const visibleLinks = navLinks
 
   return (
     <footer className="ds-footer">
@@ -44,14 +43,11 @@ export default function AppFooter() {
         <div>
           <h4>Explore</h4>
           <ul>
-            {visibleLinks.map((item) => (
+            {footerLinks.map((item) => (
               <li key={item.to}>
                 <NavItem {...item} />
               </li>
             ))}
-            <li>
-              <Link to="/register">Join the movement</Link>
-            </li>
           </ul>
         </div>
 

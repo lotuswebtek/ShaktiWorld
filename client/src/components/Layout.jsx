@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '@clerk/react'
-import { navLinks, site } from '../data/site.js'
+import { footerLinks, navLinks, site } from '../data/site.js'
 import AuthButtons from './AuthButtons.jsx'
 import NavItem from './NavItem.jsx'
 import PostAuthRedirect from './PostAuthRedirect.jsx'
@@ -132,14 +132,11 @@ export default function Layout() {
           <div>
             <h4>Explore</h4>
             <ul>
-              {visibleLinks.map((item) => (
+              {footerLinks.map((item) => (
                 <li key={item.to}>
                   <NavItem {...item} />
                 </li>
               ))}
-              <li>
-                <Link to="/register">Join the movement</Link>
-              </li>
             </ul>
           </div>
           <div>

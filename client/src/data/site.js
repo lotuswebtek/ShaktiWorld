@@ -27,6 +27,16 @@ export const navLinks = [
   { to: '/contact-us', label: 'Contact Us' },
 ]
 
+export const footerLinks = [
+  { to: '/our-events', label: 'Our Events' },
+  { to: '/community/resources', label: 'Resources' },
+  { to: '/work-with-us', label: 'Work With Us' },
+  { to: '/services', label: 'Services' },
+  { to: '/listening', label: 'Listening' },
+  { to: '/community/businesses', label: 'Businesses' },
+  { to: '/career', label: 'Career' },
+]
+
 export const pillars = [
   {
     title: 'Abundance',
