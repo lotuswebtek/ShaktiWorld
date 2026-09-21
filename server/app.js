@@ -66,7 +66,13 @@ app.use((req, res, next) => {
   })
 })
 app.use(attachBearerAuth)
-app.use(cors({ origin: true, credentials: true }))
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+    allowedHeaders: ['Authorization', 'Content-Type', 'X-Clerk-Session'],
+  }),
+)
 app.use(express.json({ limit: '1mb' }))
 
 app.get(['/api/health', '/health'], (_req, res) => {

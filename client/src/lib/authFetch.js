@@ -48,6 +48,9 @@ function friendlyFetchError(err) {
  * Skips empty tokens and retries once with a fresh token on 401.
  */
 export async function fetchWithClerkToken(path, getToken, options = {}) {
+  const method = String(options.method || 'GET').toUpperCase()
+  const skipCacheFirst = method !== 'GET' && method !== 'HEAD'
+
   const run = async (skipCache) => {
     const token = await withTimeout(
       Promise.resolve(getToken(skipCache ? { skipCache: true } : undefined)),
@@ -62,13 +65,15 @@ export async function fetchWithClerkToken(path, getToken, options = {}) {
       headers: {
         ...(options.headers || {}),
         Authorization: `Bearer ${token}`,
+        // Vercel production often strips Authorization; this copy survives.
+        'X-Clerk-Session': token,
       },
     })
     return { token, res }
   }
 
   try {
-    let { token, res } = await run(false)
+    let { token, res } = await run(skipCacheFirst)
     if (!token) {
       const retry = await run(true)
       token = retry.token
