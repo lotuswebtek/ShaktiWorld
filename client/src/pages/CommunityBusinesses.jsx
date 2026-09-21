@@ -308,5 +308,3 @@ export default function CommunityBusinesses() {
   )
 }
 
-export { categoryLabel, CATEGORY_OPTIONS }
-
