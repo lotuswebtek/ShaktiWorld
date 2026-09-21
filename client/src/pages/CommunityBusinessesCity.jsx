@@ -5,12 +5,12 @@ import RequireAuth from '../components/RequireAuth.jsx'
 import KolamDivider from '../components/design/KolamDivider.jsx'
 import { CATEGORY_OPTIONS, categoryLabel } from './CommunityBusinesses.jsx'
 
-import { API } from '../config/env.js'
+import { fetchWithClerkToken } from '../lib/authFetch.js'
 
 export default function CommunityBusinessesCity() {
   const { city } = useParams()
   const decodedCity = decodeURIComponent(city || '')
-  const { getToken } = useAuth()
+  const { isLoaded, isSignedIn, getToken } = useAuth()
   const [category, setCategory] = useState('')
   const [query, setQuery] = useState('')
   const [items, setItems] = useState([])
@@ -25,19 +25,18 @@ export default function CommunityBusinessesCity() {
   }, [category, query])
 
   useEffect(() => {
+    if (!isLoaded || !isSignedIn) return
     const load = async () => {
       setLoading(true)
       setError(null)
       try {
-        const token = await getToken()
-        const res = await fetch(`${API}/api/community/businesses/city/${encodeURIComponent(decodedCity)}?${qs}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        if (!res.ok) throw new Error('Failed to load businesses.')
-        const data = await res.json()
+        const path = `/api/community/businesses/city/${encodeURIComponent(decodedCity)}${qs ? `?${qs}` : ''}`
+        const res = await fetchWithClerkToken(path, getToken)
+        const data = await res.json().catch(() => ({}))
+        if (!res.ok) throw new Error(data.message || 'Failed to load businesses.')
         setItems(data.businesses || [])
       } catch (err) {
-        setError(err.message)
+        setError(err instanceof Error ? err.message : 'Failed to load businesses.')
         setItems([])
       } finally {
         setLoading(false)
@@ -45,7 +44,7 @@ export default function CommunityBusinessesCity() {
     }
 
     load()
-  }, [decodedCity, getToken, qs])
+  }, [decodedCity, getToken, isLoaded, isSignedIn, qs])
 
   return (
     <RequireAuth>

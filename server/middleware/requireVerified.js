@@ -1,6 +1,16 @@
 import { getRequestUserId } from '../auth.js'
 import pool from '../db/pool.js'
 
+function requestPath(req) {
+  return String(req.originalUrl || req.url || '').split('?')[0]
+}
+
+function isSignedInBrowse(req) {
+  if (req.method !== 'GET') return false
+  const path = requestPath(req)
+  return path.endsWith('/businesses/cities') || /\/businesses\/city\//.test(path)
+}
+
 /**
  * Express middleware that blocks every request under /community/*
  * unless the user's account_status is 'verified'.
@@ -13,6 +23,8 @@ export default async function requireVerified(req, res, next) {
   if (!userId) {
     return res.status(401).json({ message: 'Not authenticated.' })
   }
+
+  if (isSignedInBrowse(req)) return next()
 
   let client
   try {
@@ -39,7 +51,6 @@ export default async function requireVerified(req, res, next) {
       return res.status(403).json({ message: 'Account suspended.' })
     }
 
-    // pending
     return res.status(403).json({
       message: 'Account verification pending.',
       step: 'verification',

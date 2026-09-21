@@ -4,9 +4,9 @@ import { useAuth } from '@clerk/react'
 import RequireAuth from '../components/RequireAuth.jsx'
 import KolamDivider from '../components/design/KolamDivider.jsx'
 
-import { API } from '../config/env.js'
+import { fetchWithClerkToken } from '../lib/authFetch.js'
 
-const CATEGORY_OPTIONS = [
+export const CATEGORY_OPTIONS = [
   { value: 'home_cooked_food', label: 'Home-cooked food' },
   { value: 'tailoring', label: 'Tailoring' },
   { value: 'handicrafts', label: 'Handicrafts' },
@@ -15,7 +15,7 @@ const CATEGORY_OPTIONS = [
   { value: 'other', label: 'Other' },
 ]
 
-function categoryLabel(value) {
+export function categoryLabel(value) {
   return CATEGORY_OPTIONS.find((item) => item.value === value)?.label || 'Other'
 }
 
@@ -28,7 +28,7 @@ function toPhotoUrls(raw) {
 }
 
 export default function CommunityBusinesses() {
-  const { getToken } = useAuth()
+  const { isLoaded, isSignedIn, getToken } = useAuth()
   const [cities, setCities] = useState([])
   const [loadingCities, setLoadingCities] = useState(true)
   const [citiesError, setCitiesError] = useState(null)
@@ -54,15 +54,12 @@ export default function CommunityBusinesses() {
     setLoadingCities(true)
     setCitiesError(null)
     try {
-      const token = await getToken()
-      const res = await fetch(`${API}/api/community/businesses/cities`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      if (!res.ok) throw new Error('Failed to load cities.')
-      const data = await res.json()
+      const res = await fetchWithClerkToken('/api/community/businesses/cities', getToken)
+      const data = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(data.message || 'Failed to load cities.')
       setCities(data.cities || [])
     } catch (err) {
-      setCitiesError(err.message)
+      setCitiesError(err instanceof Error ? err.message : 'Failed to load cities.')
       setCities([])
     } finally {
       setLoadingCities(false)
@@ -71,10 +68,7 @@ export default function CommunityBusinesses() {
 
   const loadMine = async () => {
     try {
-      const token = await getToken()
-      const res = await fetch(`${API}/api/community/businesses/mine`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      const res = await fetchWithClerkToken('/api/community/businesses/mine', getToken)
       if (!res.ok) return
       const data = await res.json()
       setMine(data.business || null)
@@ -98,10 +92,10 @@ export default function CommunityBusinesses() {
   }
 
   useEffect(() => {
+    if (!isLoaded || !isSignedIn) return
     loadCities()
     loadMine()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isLoaded, isSignedIn, getToken])
 
   const submitBusiness = async (e) => {
     e.preventDefault()
@@ -109,12 +103,10 @@ export default function CommunityBusinesses() {
     setSaveMessage(null)
     setSaving(true)
     try {
-      const token = await getToken()
-      const res = await fetch(`${API}/api/community/businesses/mine`, {
+      const res = await fetchWithClerkToken('/api/community/businesses/mine', getToken, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
           name: form.name,
@@ -165,7 +157,7 @@ export default function CommunityBusinesses() {
 
               {loadingCities && <p className="lede">Loading cities…</p>}
               {citiesError && <p className="form-error">{citiesError}</p>}
-              {!loadingCities && cities.length === 0 && (
+              {!loadingCities && !citiesError && cities.length === 0 && (
                 <p className="lede">No cities are listed yet.</p>
               )}
 
